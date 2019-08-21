@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:znovel_flutter/Reader/ReaderPage.dart';
 import 'package:znovel_flutter/Reader/ReaderPainter.dart';
 import 'package:znovel_flutter/Reader/ReaderUtil.dart';
 
@@ -29,7 +30,7 @@ class ReaderWidgetState extends State<ReaderWidget> {
   PageController _controller;
   int _chapter = 0;
   int _page = 0;
-  ReaderPainter _painter;
+  ReaderPage _painter;
 
   @override
   initState(){
@@ -44,8 +45,10 @@ class ReaderWidgetState extends State<ReaderWidget> {
 
   Future _initPainter() async{
     await _getChapterContent(_chapter + 1);
+    ReaderPage painter = ReaderPage(content: _content);
+    await painter.getPages(Size(ReaderUtil.screenWidth(context),ReaderUtil.contentHeight(context)));
     setState(() {
-      _painter = ReaderPainter(content: _content);
+      _painter = painter;
     });
   }
 
@@ -56,9 +59,10 @@ class ReaderWidgetState extends State<ReaderWidget> {
   }
 
   String _getPageInfo(int page){
+    if (_painter == null) return '';
     String chapterInfo = _painter?.pageMap[page];
 
-    return chapterInfo;
+    return chapterInfo??0;
   }
 
   Future _getChapterContent(int chapter) async {
@@ -66,23 +70,18 @@ class ReaderWidgetState extends State<ReaderWidget> {
         await rootBundle.loadString('Sources/$chapter.txt').catchError((error) {
       print(error);
     });
-
-    // data = data.substring(0, 800);
     _content = data;
-    // setState(() {
-      
-    // });
   }
 
   Widget _item(int index) {
     final width = ReaderUtil.screenWidth(context);
     final height = ReaderUtil.contentHeight(context);
     return Container(
-      padding: EdgeInsets.all(10),
-        alignment: Alignment.center,
+      padding: EdgeInsets.only(top: 10),
+        alignment: Alignment.topLeft,
         child: CustomPaint(
           size: Size(width, height), 
-          painter: _painter
+          painter: ReaderPainter(content: _getPageInfo(index+1))
           )
         );
   }

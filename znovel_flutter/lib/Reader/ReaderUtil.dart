@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 
 class ReaderUtil{
   static double contentHeight(BuildContext context){
-    return MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - kToolbarHeight;
+    double topMargin = MediaQuery.of(context).padding.top;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double appBarHeight = kToolbarHeight;
+    double bottomMargin = MediaQuery.of(context).padding.bottom;
+    return screenHeight - (topMargin + appBarHeight + bottomMargin + 100);
   }
 
   static double screenWidth(BuildContext context){
