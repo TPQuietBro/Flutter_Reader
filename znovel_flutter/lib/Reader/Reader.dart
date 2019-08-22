@@ -38,6 +38,7 @@ class ReaderWidgetState extends State<ReaderWidget> {
     super.initState();
     _controller = PageController(initialPage: _page, keepPage: true);
     _controller.addListener(() {
+      
       int page = _controller.page.toInt();
       _page = page;
       // if (_isTap) {
@@ -141,6 +142,11 @@ class ReaderWidgetState extends State<ReaderWidget> {
                       print('last page');
                       _lastPage();
                     },
+                    onHorizontalDragStart: (DragStartDetails details){
+                      if (details.localPosition.dx > 0) {
+                        _lastPage();
+                      }
+                    },
                     child: Container(
                       width: 50,
                       color: Color.fromRGBO(1, 1, 1, 0),
@@ -151,6 +157,11 @@ class ReaderWidgetState extends State<ReaderWidget> {
                     onTap: () {
                       print('next page');
                       _nextPage();
+                    },
+                    onHorizontalDragStart: (DragStartDetails details){
+                      if (details.localPosition.dx > 0) {
+                        _nextPage();
+                      }
                     },
                     child: Container(
                       width: 50,
