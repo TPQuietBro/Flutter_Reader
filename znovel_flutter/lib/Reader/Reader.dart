@@ -82,7 +82,7 @@ class ReaderWidgetState extends State<ReaderWidget> {
         await rootBundle.loadString('Sources/$chapter.txt').catchError((error) {
       print(error);
     });
-    _content = data.replaceAll('\n\n', '\n');
+    _content = data;//.replaceAll('\n\n', '\n');
   }
 
   Widget _item(int index) {
