@@ -7,7 +7,7 @@ class ReaderUtil{
     double screenHeight = MediaQuery.of(context).size.height;
     double appBarHeight = kToolbarHeight;
     double bottomMargin = MediaQuery.of(context).padding.bottom;
-    return screenHeight - (topMargin + appBarHeight + bottomMargin + 100);
+    return screenHeight - (topMargin + appBarHeight + bottomMargin +44);
   }
 
   static double screenWidth(BuildContext context){

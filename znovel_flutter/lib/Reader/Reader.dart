@@ -31,14 +31,22 @@ class ReaderWidgetState extends State<ReaderWidget> {
   int _chapter = 0;
   int _page = 0;
   ReaderPage _painter;
+  bool _isTap = false;
 
   @override
   initState(){
     super.initState();
     _controller = PageController(initialPage: _page, keepPage: true);
     _controller.addListener(() {
-      _page = _controller.page.toInt();
-      // Future.wait();
+      int page = _controller.page.toInt();
+      _page = page;
+      // if (_isTap) {
+      //   _page = page;
+      //   return;
+      // }
+      // setState(() {
+      //   _page = page;
+      // });
     });
     _initPainter();
   }
@@ -46,10 +54,14 @@ class ReaderWidgetState extends State<ReaderWidget> {
   Future _initPainter() async{
     await _getChapterContent(_chapter + 1);
     ReaderPage painter = ReaderPage(content: _content);
-    await painter.getPages(Size(ReaderUtil.screenWidth(context),ReaderUtil.contentHeight(context)));
+    await painter.getPages(_paintSize());
     setState(() {
       _painter = painter;
     });
+  }
+
+  Size _paintSize(){
+    return Size(ReaderUtil.screenWidth(context),ReaderUtil.contentHeight(context));
   }
 
   @override
@@ -66,21 +78,19 @@ class ReaderWidgetState extends State<ReaderWidget> {
   }
 
   Future _getChapterContent(int chapter) async {
-    String data =
+    String data = 
         await rootBundle.loadString('Sources/$chapter.txt').catchError((error) {
       print(error);
     });
-    _content = data;
+    _content = data.replaceAll('\n\n', '\n');
   }
 
   Widget _item(int index) {
-    final width = ReaderUtil.screenWidth(context);
-    final height = ReaderUtil.contentHeight(context);
     return Container(
       padding: EdgeInsets.only(top: 10),
         alignment: Alignment.topLeft,
         child: CustomPaint(
-          size: Size(width, height), 
+          size: _paintSize(), 
           painter: ReaderPainter(content: _getPageInfo(index+1))
           )
         );
@@ -91,17 +101,22 @@ class ReaderWidgetState extends State<ReaderWidget> {
       print('已是第一页');
       return;
     }
-    _page--;
+    setState(() {
+      _page--;
+    });
     _controller.animateToPage(_page,
         duration: Duration(milliseconds: 200), curve: Curves.easeIn);
   }
 
   _nextPage() {
-    if (_page == _chapters.length - 1) {
+    if (_page == _painter.page - 1) {
       print('已完结');
       return;
     }
-    _page++;
+    setState(() {
+      _page++;
+    });
+    
     _controller.animateToPage(_page,
         duration: Duration(milliseconds: 200), curve: Curves.easeIn);
   }
@@ -144,6 +159,11 @@ class ReaderWidgetState extends State<ReaderWidget> {
                           left: ReaderUtil.screenWidth(context) - 50),
                     ),
                   ),
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: Text('${_page+1}/${_painter?.page}'),
+                  )
                 ],
               ));
   }
