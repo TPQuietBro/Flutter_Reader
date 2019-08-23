@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:znovel_flutter/Reader/ReaderUtil.dart';
 class ReaderPage{
   // 章节内容
   final String content;
@@ -55,7 +56,7 @@ class ReaderPage{
 
       // 这里直接保存每一页的内容
       String pageString = this.content.substring(_totalOffset-position.offset,_totalOffset);
-      _pageMap[_page+1] = pageString;
+      _pageMap[_page+1] = pageString.startsWith('\n') ? pageString.replaceRange(0, 1, '') : pageString;
       _page ++;
 
       // 重新布局,但不需要绘制,计算剩下内容真实布局高度
@@ -69,10 +70,7 @@ class ReaderPage{
   TextPainter _textPainter(String content){
     return TextPainter(
         textDirection: TextDirection.ltr,
-        text: TextSpan(
-            text: content??'',
-            style: TextStyle(color: Colors.black, fontSize: 14),
-            )
+        text: ReaderUtil.textSpan(content)
           );
   }
 }

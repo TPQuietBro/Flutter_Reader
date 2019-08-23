@@ -71,16 +71,24 @@ class ReaderWidgetState extends State<ReaderWidget> {
         await rootBundle.loadString('Sources/$chapter.txt').catchError((error) {
       print(error);
     });
-    _content = data; //.replaceAll('\n\n', '\n');
+    _content = data.replaceAll('\n\n', '\n');
   }
 
   Widget _item(int index) {
     return Container(
-        padding: EdgeInsets.only(top: 10),
+        // padding: EdgeInsets.only(top: 10),
         alignment: Alignment.topLeft,
-        child: CustomPaint(
-            size: _paintSize(),
-            painter: ReaderPainter(content: _getPageInfo(index + 1))));
+        // height: _paintSize().height,
+        // child: CustomPaint(
+        //     size: _paintSize(),
+        //     painter: ReaderPainter(content: _getPageInfo(index + 1))));
+        child: Container(
+          margin: EdgeInsets.all(10),
+          child: RichText(
+          text: ReaderUtil.textSpan(_getPageInfo(index + 1)),
+            )
+          )
+        );
   }
 
   _lastPage() {
@@ -107,13 +115,20 @@ class ReaderWidgetState extends State<ReaderWidget> {
     _controller.animateToPage(_page,
         duration: Duration(milliseconds: 200), curve: Curves.easeIn);
   }
-
+  // 去除右滑返回手势
+  Future<bool> _willPop(){
+    Navigator.of(context).pop();
+    return Future.value(false);
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: _willPop,
+      child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
+        
         body: Stack(
           children: <Widget>[
             NotificationListener(
@@ -173,6 +188,8 @@ class ReaderWidgetState extends State<ReaderWidget> {
               child: Text('${_page + 1}/${_painter?.page}'),
             )
           ],
-        ));
+        )
+      ),
+    );
   }
 }

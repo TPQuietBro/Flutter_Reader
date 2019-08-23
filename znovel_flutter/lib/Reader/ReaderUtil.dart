@@ -14,4 +14,16 @@ class ReaderUtil{
     final size = MediaQuery.of(context).size;
     return size.width;
   }
+
+  static TextSpan textSpan(String content){
+    return TextSpan(
+            text: content??'',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              height: 1.5
+            )
+          );
+  }
 }

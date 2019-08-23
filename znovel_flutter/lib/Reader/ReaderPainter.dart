@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class ReaderPainter extends CustomPainter{
@@ -24,8 +25,17 @@ class ReaderPainter extends CustomPainter{
         text: TextSpan(
             text: content??'',
             style: TextStyle(color: Colors.black, fontSize: 14),
+            recognizer: _tapGesture()
             )
           );
+  }
+
+  TapGestureRecognizer _tapGesture(){
+    TapGestureRecognizer tapGestureRecognizer = TapGestureRecognizer();
+    tapGestureRecognizer.onTap = (){
+      print('onTap');
+    };
+    return tapGestureRecognizer;
   }
 
   @override
