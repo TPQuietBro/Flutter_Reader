@@ -7,7 +7,7 @@ class ReaderUtil{
     double screenHeight = MediaQuery.of(context).size.height;
     double appBarHeight = kToolbarHeight;
     double bottomMargin = MediaQuery.of(context).padding.bottom;
-    return screenHeight - (topMargin + appBarHeight + bottomMargin +44);
+    return screenHeight - (topMargin + appBarHeight + bottomMargin + 44);
   }
 
   static double screenWidth(BuildContext context){
@@ -15,14 +15,14 @@ class ReaderUtil{
     return size.width;
   }
 
-  static TextSpan textSpan(String content){
+  static TextSpan textSpan(String content,{double fontSize = 14,Color color = Colors.black}){
     return TextSpan(
             text: content??'',
             style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
+              fontSize: fontSize,
+              color: color,
               fontWeight: FontWeight.w400,
-              height: 1.5
+              height: 1.5,
             )
           );
   }

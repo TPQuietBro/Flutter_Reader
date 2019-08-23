@@ -53,10 +53,12 @@ class ReaderPage{
       
       // remainString 表示剩下的字符串来计算page
       String remainString = string.substring(position.offset);
-
+      
       // 这里直接保存每一页的内容
       String pageString = this.content.substring(_totalOffset-position.offset,_totalOffset);
-      _pageMap[_page+1] = pageString.startsWith('\n') ? pageString.replaceRange(0, 1, '') : pageString;
+      pageString = pageString.startsWith('\n') ? pageString.replaceRange(0, 1, '') : pageString;
+      pageString = pageString.endsWith('\n') ? pageString.replaceRange(position.offset-1, position.offset, '') : pageString;
+      _pageMap[_page+1] = pageString;
       _page ++;
 
       // 重新布局,但不需要绘制,计算剩下内容真实布局高度

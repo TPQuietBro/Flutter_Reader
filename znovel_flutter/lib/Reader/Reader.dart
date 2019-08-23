@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:znovel_flutter/Reader/ReaderFontSelector.dart';
 import 'package:znovel_flutter/Reader/ReaderPage.dart';
 import 'package:znovel_flutter/Reader/ReaderPainter.dart';
+import 'package:znovel_flutter/Reader/ReaderTheme.dart';
 import 'package:znovel_flutter/Reader/ReaderUtil.dart';
 
 class ReaderWidget extends StatefulWidget {
@@ -14,7 +16,7 @@ class ReaderWidget extends StatefulWidget {
   ReaderWidgetState createState() => ReaderWidgetState();
 }
 
-class ReaderWidgetState extends State<ReaderWidget> {
+class ReaderWidgetState extends State<ReaderWidget> with SingleTickerProviderStateMixin{
   String _content = '';
   List _chapters = [
     'Sources/1.txt',
@@ -31,11 +33,26 @@ class ReaderWidgetState extends State<ReaderWidget> {
   int _chapter = 0;
   int _page = 0;
   ReaderPage _painter;
+  ReaderTheme _readerTheme;
+  Color _bgColor;
+
+  ReaderFontSelector _fontSelector;
+  double _fontSize;
 
   @override
   initState() {
     super.initState();
     _controller = PageController(initialPage: _page, keepPage: true);
+    _readerTheme = ReaderTheme(callBack: (color){
+      setState(() {
+        _bgColor = color;
+      });
+    },);
+    _fontSelector = ReaderFontSelector(callBack: (fontSize){
+      setState(() {
+        _fontSize = fontSize;
+      });
+    },);
     _initPainter();
   }
 
@@ -50,7 +67,7 @@ class ReaderWidgetState extends State<ReaderWidget> {
 
   Size _paintSize() {
     return Size(
-        ReaderUtil.screenWidth(context), ReaderUtil.contentHeight(context));
+        ReaderUtil.screenWidth(context)-20, ReaderUtil.contentHeight(context)-20);
   }
 
   @override
@@ -72,23 +89,37 @@ class ReaderWidgetState extends State<ReaderWidget> {
       print(error);
     });
     _content = data.replaceAll('\n\n', '\n');
+    // _content = _content.replaceAll('\n', '');
   }
 
   Widget _item(int index) {
-    return Container(
-        // padding: EdgeInsets.only(top: 10),
+    return GestureDetector(
+      onTap: (){
+        // print('showalert');
+        showModalBottomSheet(context: context,builder: (BuildContext context){
+          return Container(
+            color: Colors.red,
+            height: 200,
+            child: Column(
+              children: <Widget>[
+                _readerTheme,
+                _fontSelector
+              ],
+            )
+          );
+        });
+      },
+      child: Container(
         alignment: Alignment.topLeft,
-        // height: _paintSize().height,
-        // child: CustomPaint(
-        //     size: _paintSize(),
-        //     painter: ReaderPainter(content: _getPageInfo(index + 1))));
         child: Container(
+          // color: Colors.orange,
           margin: EdgeInsets.all(10),
           child: RichText(
-          text: ReaderUtil.textSpan(_getPageInfo(index + 1)),
+          text: ReaderUtil.textSpan(_getPageInfo(index + 1),fontSize: _fontSize),
             )
           )
-        );
+        ),
+    );
   }
 
   _lastPage() {
@@ -125,10 +156,11 @@ class ReaderWidgetState extends State<ReaderWidget> {
     return WillPopScope(
       onWillPop: _willPop,
       child: Scaffold(
+        backgroundColor: _bgColor??Colors.white,
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        
+
         body: Stack(
           children: <Widget>[
             NotificationListener(
@@ -141,13 +173,15 @@ class ReaderWidgetState extends State<ReaderWidget> {
                 }
                 return true;
               },
-              child: PageView.builder(
+              child: Listener(
+                child: PageView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _painter?.page,
                   controller: _controller,
                   itemBuilder: (BuildContext context, int index) {
                     return _item(index);
                   }),
+              )
             ),
             GestureDetector(
               onTap: () {
@@ -188,7 +222,8 @@ class ReaderWidgetState extends State<ReaderWidget> {
               child: Text('${_page + 1}/${_painter?.page}'),
             )
           ],
-        )
+        ),
+      
       ),
     );
   }
