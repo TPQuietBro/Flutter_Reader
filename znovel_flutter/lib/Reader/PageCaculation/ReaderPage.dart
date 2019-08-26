@@ -19,6 +19,7 @@ class ReaderPage{
 
   // 计算页面数量的TextPainter
   TextPainter _painter;
+  final DateTime start = DateTime.now();
 
   Future getPages(Size size) async{
     print('content length = ${this.content.length}');
@@ -40,7 +41,9 @@ class ReaderPage{
       _page ++;
       _pageMap[_page] = lastContent;
     }
-    // print('page = $_page map = $_pageMap');
+    Duration end = DateTime.now().difference(start);
+    
+    print('caculate pages cost : ${end.inMilliseconds / 1000.0}s');
   }
 
   _caculatePages(double paintHeight,Size size,String string){

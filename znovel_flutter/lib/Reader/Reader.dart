@@ -6,12 +6,14 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:znovel_flutter/Reader/Component/ReaderFontSelector.dart';
 import 'package:znovel_flutter/Reader/Model/FontModel.dart';
 import 'package:znovel_flutter/Reader/Model/ThemeModel.dart';
+import 'package:znovel_flutter/Reader/PageCaculation/ReaderItem.dart';
 import 'package:znovel_flutter/Reader/PageCaculation/ReaderPage.dart';
 import 'package:znovel_flutter/Reader/Component/ReaderTheme.dart';
 import 'package:znovel_flutter/Reader/Util/ReaderUtil.dart';
 
 final themeModel = ThemeModel();
 final fontModel = FontModel();
+final _renderItem = ReaderItem();
 
 class ReaderWidget extends StatefulWidget {
   final String title;
