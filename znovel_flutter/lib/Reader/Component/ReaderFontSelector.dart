@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:znovel_flutter/Reader/Model/FontModel.dart';
 
 class ReaderFontSelector extends StatelessWidget{
-  final Function callBack;
-  ReaderFontSelector({@required this.callBack});
+  final FontModel fontModel;
+  ReaderFontSelector({this.fontModel});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -11,7 +12,7 @@ class ReaderFontSelector extends StatelessWidget{
         children: <Widget>[
           GestureDetector(
             onTap: (){
-              this.callBack(13.0);
+              this.fontModel.setFontSize(13.0);
             },
             child: Container(
               color: Colors.orange,
@@ -23,7 +24,7 @@ class ReaderFontSelector extends StatelessWidget{
           ),
           GestureDetector(
             onTap: (){
-              this.callBack(14.0);
+              this.fontModel.setFontSize(14.0);
             },
             child: Container(
               color: Colors.orange,
@@ -35,7 +36,7 @@ class ReaderFontSelector extends StatelessWidget{
           ),
           GestureDetector(
             onTap: (){
-              this.callBack(15.0);
+              this.fontModel.setFontSize(15.0);
             },
             child: Container(
               color: Colors.orange,

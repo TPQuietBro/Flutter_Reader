@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:znovel_flutter/Reader/ReaderUtil.dart';
+import 'package:znovel_flutter/Reader/Util/ReaderUtil.dart';
 class ReaderPage{
   // 章节内容
   final String content;

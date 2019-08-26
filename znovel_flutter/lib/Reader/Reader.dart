@@ -2,11 +2,16 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:znovel_flutter/Reader/ReaderFontSelector.dart';
-import 'package:znovel_flutter/Reader/ReaderPage.dart';
-import 'package:znovel_flutter/Reader/ReaderPainter.dart';
-import 'package:znovel_flutter/Reader/ReaderTheme.dart';
-import 'package:znovel_flutter/Reader/ReaderUtil.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:znovel_flutter/Reader/Component/ReaderFontSelector.dart';
+import 'package:znovel_flutter/Reader/Model/FontModel.dart';
+import 'package:znovel_flutter/Reader/Model/ThemeModel.dart';
+import 'package:znovel_flutter/Reader/PageCaculation/ReaderPage.dart';
+import 'package:znovel_flutter/Reader/Component/ReaderTheme.dart';
+import 'package:znovel_flutter/Reader/Util/ReaderUtil.dart';
+
+final themeModel = ThemeModel();
+final fontModel = FontModel();
 
 class ReaderWidget extends StatefulWidget {
   final String title;
@@ -16,7 +21,8 @@ class ReaderWidget extends StatefulWidget {
   ReaderWidgetState createState() => ReaderWidgetState();
 }
 
-class ReaderWidgetState extends State<ReaderWidget> with SingleTickerProviderStateMixin{
+class ReaderWidgetState extends State<ReaderWidget>
+    with SingleTickerProviderStateMixin {
   String _content = '';
   List _chapters = [
     'Sources/1.txt',
@@ -34,25 +40,19 @@ class ReaderWidgetState extends State<ReaderWidget> with SingleTickerProviderSta
   int _page = 0;
   ReaderPage _painter;
   ReaderTheme _readerTheme;
-  Color _bgColor;
-
   ReaderFontSelector _fontSelector;
-  double _fontSize;
 
   @override
   initState() {
     super.initState();
     _controller = PageController(initialPage: _page, keepPage: true);
-    _readerTheme = ReaderTheme(callBack: (color){
-      setState(() {
-        _bgColor = color;
-      });
-    },);
-    _fontSelector = ReaderFontSelector(callBack: (fontSize){
-      setState(() {
-        _fontSize = fontSize;
-      });
-    },);
+    _readerTheme = ReaderTheme(
+      themeModel: themeModel,
+    );
+    themeModel.setTextColor(Colors.black);
+    _fontSelector = ReaderFontSelector(
+      fontModel: fontModel,
+    );
     _initPainter();
   }
 
@@ -66,8 +66,8 @@ class ReaderWidgetState extends State<ReaderWidget> with SingleTickerProviderSta
   }
 
   Size _paintSize() {
-    return Size(
-        ReaderUtil.screenWidth(context)-20, ReaderUtil.contentHeight(context)-20);
+    return Size(ReaderUtil.screenWidth(context) - 20,
+        ReaderUtil.contentHeight(context) - 20);
   }
 
   @override
@@ -94,31 +94,30 @@ class ReaderWidgetState extends State<ReaderWidget> with SingleTickerProviderSta
 
   Widget _item(int index) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         // print('showalert');
-        showModalBottomSheet(context: context,builder: (BuildContext context){
-          return Container(
-            color: Colors.red,
-            height: 200,
-            child: Column(
-              children: <Widget>[
-                _readerTheme,
-                _fontSelector
-              ],
-            )
-          );
-        });
+        showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Container(
+                  color: Colors.red,
+                  height: 200,
+                  child: Column(
+                    children: <Widget>[_readerTheme, _fontSelector],
+                  ));
+            });
       },
       child: Container(
-        alignment: Alignment.topLeft,
-        child: Container(
-          // color: Colors.orange,
-          margin: EdgeInsets.all(10),
-          child: RichText(
-          text: ReaderUtil.textSpan(_getPageInfo(index + 1),fontSize: _fontSize),
-            )
-          )
-        ),
+          alignment: Alignment.topLeft,
+          child: Container(
+              // color: Colors.orange,
+              margin: EdgeInsets.all(10),
+              child: Observer(
+                builder: (_) => RichText(
+                  text: ReaderUtil.textSpan(_getPageInfo(index + 1),
+                      fontSize: fontModel.fontSize,color: themeModel.textColor),
+                ),
+              ))),
     );
   }
 
@@ -146,85 +145,85 @@ class ReaderWidgetState extends State<ReaderWidget> with SingleTickerProviderSta
     _controller.animateToPage(_page,
         duration: Duration(milliseconds: 200), curve: Curves.easeIn);
   }
+
   // 去除右滑返回手势
-  Future<bool> _willPop(){
+  Future<bool> _willPop() {
     Navigator.of(context).pop();
     return Future.value(false);
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _willPop,
-      child: Scaffold(
-        backgroundColor: _bgColor??Colors.white,
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-
-        body: Stack(
-          children: <Widget>[
-            NotificationListener(
-              onNotification: (ScrollEndNotification notification) {
-                int page = _controller.page.toInt();
-                if (page != _page) {
-                  setState(() {
-                    _page = page;
-                  });
-                }
-                return true;
-              },
-              child: Listener(
-                child: PageView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _painter?.page,
-                  controller: _controller,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _item(index);
-                  }),
-              )
+        onWillPop: _willPop,
+        child: Observer(
+          builder: (_) => Scaffold(
+            backgroundColor: themeModel.themeColor ?? Colors.white,
+            appBar: AppBar(
+              title: Text(widget.title),
             ),
-            GestureDetector(
-              onTap: () {
-                print('last page');
-                _lastPage();
-              },
-              onHorizontalDragStart: (DragStartDetails details) {
-                if (details.localPosition.dx > 0) {
-                  _lastPage();
-                }
-              },
-              child: Container(
-                width: 50,
-                color: Color.fromRGBO(1, 1, 1, 0),
-                padding: EdgeInsets.only(left: 0),
-              ),
+            body: Stack(
+              children: <Widget>[
+                NotificationListener(
+                    onNotification: (ScrollEndNotification notification) {
+                      int page = _controller.page.toInt();
+                      if (page != _page) {
+                        setState(() {
+                          _page = page;
+                        });
+                      }
+                      return true;
+                    },
+                    child: Listener(
+                      child: PageView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _painter?.page,
+                          controller: _controller,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _item(index);
+                          }),
+                    )),
+                GestureDetector(
+                  onTap: () {
+                    print('last page');
+                    _lastPage();
+                  },
+                  onHorizontalDragStart: (DragStartDetails details) {
+                    if (details.localPosition.dx > 0) {
+                      _lastPage();
+                    }
+                  },
+                  child: Container(
+                    width: 50,
+                    color: Color.fromRGBO(1, 1, 1, 0),
+                    padding: EdgeInsets.only(left: 0),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    print('next page');
+                    _nextPage();
+                  },
+                  onHorizontalDragStart: (DragStartDetails details) {
+                    if (details.localPosition.dx > 0) {
+                      _nextPage();
+                    }
+                  },
+                  child: Container(
+                    width: 50,
+                    color: Color.fromRGBO(1, 1, 1, 0),
+                    margin: EdgeInsets.only(
+                        left: ReaderUtil.screenWidth(context) - 50),
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: Text('${_page + 1}/${_painter?.page}'),
+                )
+              ],
             ),
-            GestureDetector(
-              onTap: () {
-                print('next page');
-                _nextPage();
-              },
-              onHorizontalDragStart: (DragStartDetails details) {
-                if (details.localPosition.dx > 0) {
-                  _nextPage();
-                }
-              },
-              child: Container(
-                width: 50,
-                color: Color.fromRGBO(1, 1, 1, 0),
-                margin:
-                    EdgeInsets.only(left: ReaderUtil.screenWidth(context) - 50),
-              ),
-            ),
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: Text('${_page + 1}/${_painter?.page}'),
-            )
-          ],
-        ),
-      
-      ),
-    );
+          ),
+        ));
   }
 }

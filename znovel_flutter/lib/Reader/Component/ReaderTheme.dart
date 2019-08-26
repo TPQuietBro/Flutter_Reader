@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:znovel_flutter/Reader/Model/ThemeModel.dart';
 
 class ReaderTheme extends StatelessWidget{
-  final Function callBack;
-  ReaderTheme({this.callBack});
+  final ThemeModel themeModel;
+  ReaderTheme({this.themeModel});
   final List _colors = [Colors.white,Colors.black,Colors.brown,Colors.green,Colors.purple];
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,12 @@ class ReaderTheme extends StatelessWidget{
         itemBuilder: (BuildContext context,int index){
           return GestureDetector(
             onTap: (){
-              this.callBack(_colors[index]);
+              if (index == 1) {
+                this.themeModel.setTextColor(Colors.grey);
+              } else {
+                this.themeModel.setTextColor(Colors.black);
+              }
+              this.themeModel.setThemeColor(_colors[index]);
             },
             child: Container(
             margin: EdgeInsets.only(left: 10),
