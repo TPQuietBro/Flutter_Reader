@@ -48,19 +48,28 @@ class ReaderWidgetState extends State<ReaderWidget>
   initState() {
     super.initState();
     _controller = PageController(initialPage: _page, keepPage: true);
+    fontModel.fontSize = 14;
     _readerTheme = ReaderTheme(
       themeModel: themeModel,
     );
     themeModel.setTextColor(Colors.black);
     _fontSelector = ReaderFontSelector(
       fontModel: fontModel,
+      fontChaneCallBack: (){
+        _initPainter();
+        if (_page != _painter.pageMap.length-1){
+          _controller.jumpToPage(_page);
+          return;
+        }
+        _controller.jumpToPage(0);
+      },
     );
     _initPainter();
   }
 
   Future _initPainter() async {
     await _getChapterContent(_chapter + 1);
-    ReaderPage painter = ReaderPage(content: _content);
+    ReaderPage painter = ReaderPage(content: _content,fontSize: fontModel.fontSize);
     await painter.getPages(_paintSize());
     setState(() {
       _painter = painter;
@@ -117,13 +126,13 @@ class ReaderWidgetState extends State<ReaderWidget>
               child: Observer(
                 builder: (_) => RichText(
                   text: ReaderUtil.textSpan(_getPageInfo(index + 1),
-                      fontSize: fontModel.fontSize,color: themeModel.textColor),
+                      fontSize: fontModel.fontSize,color: themeModel.textColor),  
                 ),
               ))),
     );
   }
 
-  _lastPage() {
+  _lastPage(bool animation) {
     if (_page == 0) {
       print('已是第一页');
       return;
@@ -131,11 +140,16 @@ class ReaderWidgetState extends State<ReaderWidget>
     setState(() {
       _page--;
     });
-    _controller.animateToPage(_page,
+    if (animation){
+      _controller.animateToPage(_page,
         duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+    } else {
+      _controller.jumpToPage(_page);
+    }
+    
   }
 
-  _nextPage() {
+  _nextPage(bool animation) {
     if (_page == _painter.page - 1) {
       print('已完结');
       return;
@@ -144,8 +158,12 @@ class ReaderWidgetState extends State<ReaderWidget>
       _page++;
     });
 
-    _controller.animateToPage(_page,
+    if (animation){
+      _controller.animateToPage(_page,
         duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+    } else {
+      _controller.jumpToPage(_page);
+    }
   }
 
   // 去除右滑返回手势
@@ -188,11 +206,11 @@ class ReaderWidgetState extends State<ReaderWidget>
                 GestureDetector(
                   onTap: () {
                     print('last page');
-                    _lastPage();
+                    _lastPage(false);
                   },
                   onHorizontalDragStart: (DragStartDetails details) {
                     if (details.localPosition.dx > 0) {
-                      _lastPage();
+                      _lastPage(true);
                     }
                   },
                   child: Container(
@@ -204,11 +222,11 @@ class ReaderWidgetState extends State<ReaderWidget>
                 GestureDetector(
                   onTap: () {
                     print('next page');
-                    _nextPage();
+                    _nextPage(false);
                   },
                   onHorizontalDragStart: (DragStartDetails details) {
                     if (details.localPosition.dx > 0) {
-                      _nextPage();
+                      _nextPage(true);
                     }
                   },
                   child: Container(

@@ -4,7 +4,8 @@ import 'package:znovel_flutter/Reader/Util/ReaderUtil.dart';
 class ReaderPage{
   // 章节内容
   final String content;
-  ReaderPage({@required this.content});
+  final double fontSize;
+  ReaderPage({@required this.content,this.fontSize});
 
   // 页数
   int get page => _page;
@@ -75,7 +76,7 @@ class ReaderPage{
   TextPainter _textPainter(String content){
     return TextPainter(
         textDirection: TextDirection.ltr,
-        text: ReaderUtil.textSpan(content)
+        text: ReaderUtil.textSpan(content,fontSize: this.fontSize)
           );
   }
 }
