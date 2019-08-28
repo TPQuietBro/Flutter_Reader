@@ -9,6 +9,7 @@ import 'package:znovel_flutter/Reader/Model/ThemeModel.dart';
 import 'package:znovel_flutter/Reader/PageCaculation/ReaderItem.dart';
 import 'package:znovel_flutter/Reader/PageCaculation/ReaderPage.dart';
 import 'package:znovel_flutter/Reader/Component/ReaderTheme.dart';
+import 'package:znovel_flutter/Reader/ReaderPainter.dart';
 import 'package:znovel_flutter/Reader/Util/ReaderUtil.dart';
 
 final themeModel = ThemeModel();
@@ -40,6 +41,7 @@ class ReaderWidgetState extends State<ReaderWidget>
   PageController _controller;
   int _chapter = 0;
   int _page = 0;
+  int _index = 0;
   ReaderPage _painter;
   ReaderTheme _readerTheme;
   ReaderFontSelector _fontSelector;
@@ -81,10 +83,17 @@ class ReaderWidgetState extends State<ReaderWidget>
         ReaderUtil.contentHeight(context) - 20);
   }
 
+  ReaderPainter _getReaderPainter(int index){
+    ReaderPainter _readerPainter = ReaderPainter(content: _getPageInfo(index + 1),fontSize:fontModel.fontSize,themeColor: themeModel.textColor);
+    return _readerPainter;
+  }
+
   @override
   dispose() {
     super.dispose();
     _controller.dispose();
+    fontModel.dispose();
+    themeModel.dispose();
   }
 
   String _getPageInfo(int page) {
@@ -106,7 +115,6 @@ class ReaderWidgetState extends State<ReaderWidget>
   Widget _item(int index) {
     return GestureDetector(
       onTap: () {
-        // print('showalert');
         showModalBottomSheet(
             context: context,
             builder: (BuildContext context) {
@@ -124,13 +132,26 @@ class ReaderWidgetState extends State<ReaderWidget>
               // color: Colors.orange,
               margin: EdgeInsets.all(10),
               child: Observer(
-                builder: (_) => RichText(
-                  text: ReaderUtil.textSpan(_getPageInfo(index + 1),
-                      fontSize: fontModel.fontSize,color: themeModel.textColor),  
-                ),
+                builder: (_){
+                //   return RichText(
+                //   text: ReaderUtil.textSpan(_getPageInfo(index + 1),
+                //       fontSize: fontModel.fontSize,color: themeModel.textColor),  
+                // );
+                return CustomPaint(
+                  size: Size(ReaderUtil.screenWidth(context), ReaderUtil.contentHeight(context)),
+                  painter: _getReaderPainter(index),
+                );
+                }
               ))),
     );
   }
+
+  // TextRange _textRange(String subString){
+  //   int start = _content.indexOf(subString);
+  //   int end = start + subString.length;
+  //   TextRange range = TextRange(start: start,end: end);
+  //   return range;
+  // }
 
   _lastPage(bool animation) {
     if (_page == 0) {

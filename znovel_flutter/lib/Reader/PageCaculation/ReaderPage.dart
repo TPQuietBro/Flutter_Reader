@@ -22,6 +22,8 @@ class ReaderPage{
   TextPainter _painter;
   final DateTime start = DateTime.now();
 
+  
+
   Future getPages(Size size) async{
     print('content length = ${this.content.length}');
     _painter = _textPainter(this.content);
@@ -50,7 +52,7 @@ class ReaderPage{
   _caculatePages(double paintHeight,Size size,String string){
     // getPositionForOffset可以拿到在屏幕内的字符串偏移量,不超过绘制size的最大偏移量,也就是每一页的字数
     TextPosition position = _painter.getPositionForOffset(Offset(size.width, size.height));
-    print('offset = ${position.offset}');
+    // print('offset = ${position.offset}');
     while (_painter.size.height > size.height) {
 
       _totalOffset += position.offset;
