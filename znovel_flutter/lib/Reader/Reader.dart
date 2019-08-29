@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:znovel_flutter/Reader/Component/PlaceholderSpaceSpan.dart';
 import 'package:znovel_flutter/Reader/Component/ReaderFontSelector.dart';
 import 'package:znovel_flutter/Reader/Model/FontModel.dart';
 import 'package:znovel_flutter/Reader/Model/ThemeModel.dart';
@@ -57,9 +59,9 @@ class ReaderWidgetState extends State<ReaderWidget>
     themeModel.setTextColor(Colors.black);
     _fontSelector = ReaderFontSelector(
       fontModel: fontModel,
-      fontChaneCallBack: (){
+      fontChaneCallBack: () {
         _initPainter();
-        if (_page != _painter.pageMap.length-1){
+        if (_page != _painter.pageMap.length - 1) {
           _controller.jumpToPage(_page);
           return;
         }
@@ -71,7 +73,8 @@ class ReaderWidgetState extends State<ReaderWidget>
 
   Future _initPainter() async {
     await _getChapterContent(_chapter + 1);
-    ReaderPage painter = ReaderPage(content: _content,fontSize: fontModel.fontSize);
+    ReaderPage painter =
+        ReaderPage(content: _content, fontSize: fontModel.fontSize);
     await painter.getPages(_paintSize());
     setState(() {
       _painter = painter;
@@ -83,8 +86,11 @@ class ReaderWidgetState extends State<ReaderWidget>
         ReaderUtil.contentHeight(context) - 20);
   }
 
-  ReaderPainter _getReaderPainter(int index){
-    ReaderPainter _readerPainter = ReaderPainter(content: _getPageInfo(index + 1),fontSize:fontModel.fontSize,themeColor: themeModel.textColor);
+  ReaderPainter _getReaderPainter(int index) {
+    ReaderPainter _readerPainter = ReaderPainter(
+        content: _getPageInfo(index + 1),
+        fontSize: fontModel.fontSize,
+        themeColor: themeModel.textColor);
     return _readerPainter;
   }
 
@@ -99,8 +105,27 @@ class ReaderWidgetState extends State<ReaderWidget>
   String _getPageInfo(int page) {
     if (_painter == null) return '';
     String chapterInfo = _painter?.pageMap[page];
+    // int offset = ReaderItem().getItemRenderRect(ReaderUtil.adImageSize(context), chapterInfo);
+    // String subString = chapterInfo.substring(0,offset);
+    // print('offset = $offset, substring = $subString');
 
     return chapterInfo ?? 0;
+  }
+
+  String _prefixString(int page) {
+    String chapterInfo = _getPageInfo(page);
+    int offset = ReaderItem().getItemRenderRect(ReaderUtil.adImageSize(context), chapterInfo);
+    String subString = chapterInfo.substring(0,offset);
+    // print('offset = $offset, substring = $subString');
+    return subString;
+  }
+
+  String _endString(int page){
+    String chapterInfo = _getPageInfo(page);
+    int offset = ReaderItem().getItemRenderRect(ReaderUtil.adImageSize(context), chapterInfo);
+    String subString = chapterInfo.substring(offset);
+    // print('offset = $offset, substring = $subString');
+    return subString;
   }
 
   Future _getChapterContent(int chapter) async {
@@ -131,18 +156,50 @@ class ReaderWidgetState extends State<ReaderWidget>
           child: Container(
               // color: Colors.orange,
               margin: EdgeInsets.all(10),
-              child: Observer(
-                builder: (_){
-                //   return RichText(
-                //   text: ReaderUtil.textSpan(_getPageInfo(index + 1),
-                //       fontSize: fontModel.fontSize,color: themeModel.textColor),  
+              child: Observer(builder: (_) {
+                return Text.rich(TextSpan(children: [
+                  ReaderUtil.textSpan(_getPageInfo(index+1),
+                      fontSize: fontModel.fontSize,
+                      color: themeModel.textColor),
+                  // WidgetSpan(child: Image(
+                  //   image: AssetImage('Sources/1111.jpeg'),width: 100,height: 50,
+                  // )
+                  //   ),
+                  // ReaderUtil.textSpan(_endString(index+1),
+                  //     fontSize: fontModel.fontSize,
+                  //     color: themeModel.textColor),
+                ]));
+
+                // return RichText(
+                // text: ReaderUtil.textSpan(_getPageInfo(index + 1),
+                //     fontSize: fontModel.fontSize,
+                //     color: themeModel.textColor),
                 // );
-                return CustomPaint(
-                  size: Size(ReaderUtil.screenWidth(context), ReaderUtil.contentHeight(context)),
-                  painter: _getReaderPainter(index),
-                );
-                }
-              ))),
+
+                // return Stack(
+                //   children: <Widget>[
+                //     Positioned(
+                //       left: 0,
+                //       top: 0,
+                //       child: RichText(
+                //         text: SpaceSpan(
+                //             contentWidth: 100.0,
+                //             contentHeight: 100.0,
+                //             bgColor: Colors.red,
+                //             recognizer: TapGestureRecognizer()
+                //               ..onTap = () {
+                //                 print('tapped');
+                //               }),
+                //       ),
+                //     )
+                //   ],
+                // );
+
+                // return CustomPaint(
+                //   size: Size(ReaderUtil.screenWidth(context), ReaderUtil.contentHeight(context)),
+                //   painter: _getReaderPainter(index),
+                // );
+              }))),
     );
   }
 
@@ -161,13 +218,12 @@ class ReaderWidgetState extends State<ReaderWidget>
     setState(() {
       _page--;
     });
-    if (animation){
+    if (animation) {
       _controller.animateToPage(_page,
-        duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+          duration: Duration(milliseconds: 200), curve: Curves.easeIn);
     } else {
       _controller.jumpToPage(_page);
     }
-    
   }
 
   _nextPage(bool animation) {
@@ -179,9 +235,9 @@ class ReaderWidgetState extends State<ReaderWidget>
       _page++;
     });
 
-    if (animation){
+    if (animation) {
       _controller.animateToPage(_page,
-        duration: Duration(milliseconds: 200), curve: Curves.easeIn);
+          duration: Duration(milliseconds: 200), curve: Curves.easeIn);
     } else {
       _controller.jumpToPage(_page);
     }

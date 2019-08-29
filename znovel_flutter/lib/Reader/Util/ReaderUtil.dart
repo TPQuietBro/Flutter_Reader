@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class ReaderUtil{
@@ -16,6 +15,10 @@ class ReaderUtil{
     return size.width;
   }
 
+  static Size adImageSize(BuildContext context){
+    return Size(screenWidth(context),100);
+  }
+
   static TextSpan textSpan(String content,{double fontSize = 14,Color color = Colors.black}){
 
     return TextSpan(
@@ -25,11 +28,7 @@ class ReaderUtil{
               color: color,
               fontWeight: FontWeight.w400,
               height: 1.5,
-            ),
-            recognizer: LongPressGestureRecognizer()
-            ..onLongPress = (){
-              print('longPress');
-            }
+            )
           );
   }
 }

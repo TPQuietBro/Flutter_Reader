@@ -31,7 +31,7 @@ class ReaderPainter extends CustomPainter{
   TextPainter _textPainter(String content){
     return TextPainter(
         textDirection: TextDirection.ltr,
-        text: ReaderUtil.textSpan(content,fontSize: this.fontSize,color: this.themeColor)
+        text:ReaderUtil.textSpan(content,fontSize: this.fontSize,color: this.themeColor)
           );
   }
 

@@ -81,4 +81,12 @@ class ReaderPage{
         text: ReaderUtil.textSpan(content,fontSize: this.fontSize)
           );
   }
+
+  TextSpan _caculatePageSpan(String content){
+    return TextSpan(
+      children: [
+
+      ]
+    );
+  }
 }
