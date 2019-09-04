@@ -12,10 +12,10 @@ class ReaderItem {
     return position.offset;
   }
 
-  TextPainter _textPainter(String content){
+  TextPainter _textPainter(String content,[TextSpan textSpan]){
     return TextPainter(
       textDirection: TextDirection.ltr,
-      text: ReaderUtil.textSpan(content)
+      text:  textSpan??ReaderUtil.textSpan(content)
     );
   }
 }

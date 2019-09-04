@@ -4,7 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:znovel_flutter/Reader/Component/PlaceholderSpaceSpan.dart';
+import 'package:znovel_flutter/Reader/Component/ContentSpan.dart';
+import 'package:znovel_flutter/Reader/Component/SpaceSpan.dart';
 import 'package:znovel_flutter/Reader/Component/ReaderFontSelector.dart';
 import 'package:znovel_flutter/Reader/Model/FontModel.dart';
 import 'package:znovel_flutter/Reader/Model/ThemeModel.dart';
@@ -157,24 +158,30 @@ class ReaderWidgetState extends State<ReaderWidget>
               // color: Colors.orange,
               margin: EdgeInsets.all(10),
               child: Observer(builder: (_) {
-                return Text.rich(TextSpan(children: [
+                // return Text.rich(TextSpan(children: [
+                //   ReaderUtil.textSpan(_getPageInfo(index+1),
+                //       fontSize: fontModel.fontSize,
+                //       color: themeModel.textColor),
+                //   WidgetSpan(child: Image(
+                //     image: AssetImage('Sources/1111.jpeg'),width: 100,height: 50,
+                //   )
+                //     ),
+                //   ReaderUtil.textSpan(_endString(index+1),
+                //       fontSize: fontModel.fontSize,
+                //       color: themeModel.textColor),
+                // ]));
+
+                // return ContentSpan(
+                //   content: _getPageInfo(index+1),
+                //   fontModel: fontModel,
+                //   themeModel: themeModel,
+                // );
+
+                return Text.rich(
                   ReaderUtil.textSpan(_getPageInfo(index+1),
                       fontSize: fontModel.fontSize,
                       color: themeModel.textColor),
-                  // WidgetSpan(child: Image(
-                  //   image: AssetImage('Sources/1111.jpeg'),width: 100,height: 50,
-                  // )
-                  //   ),
-                  // ReaderUtil.textSpan(_endString(index+1),
-                  //     fontSize: fontModel.fontSize,
-                  //     color: themeModel.textColor),
-                ]));
-
-                // return RichText(
-                // text: ReaderUtil.textSpan(_getPageInfo(index + 1),
-                //     fontSize: fontModel.fontSize,
-                //     color: themeModel.textColor),
-                // );
+                );
 
                 // return Stack(
                 //   children: <Widget>[

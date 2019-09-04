@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:znovel_flutter/Reader/Component/SpaceSpan.dart';
 import 'package:znovel_flutter/Reader/Util/ReaderUtil.dart';
 class ReaderPage{
   // 章节内容
@@ -47,17 +48,20 @@ class ReaderPage{
     Duration end = DateTime.now().difference(start);
     
     print('caculate pages cost : ${end.inMilliseconds / 1000.0}s');
+    print('caculate pages : $_page');
   }
 
   _caculatePages(double paintHeight,Size size,String string){
     // getPositionForOffset可以拿到在屏幕内的字符串偏移量,不超过绘制size的最大偏移量,也就是每一页的字数
     TextPosition position = _painter.getPositionForOffset(Offset(size.width, size.height));
+    
     // print('offset = ${position.offset}');
     while (_painter.size.height > size.height) {
 
       _totalOffset += position.offset;
       
       // remainString 表示剩下的字符串来计算page
+
       String remainString = string.substring(position.offset);
       
       // 这里直接保存每一页的内容
@@ -75,10 +79,15 @@ class ReaderPage{
     }
   }
 
-  TextPainter _textPainter(String content){
+  TextPainter _textPainter(String content,[bool hasAd = false]){
     return TextPainter(
         textDirection: TextDirection.ltr,
-        text: ReaderUtil.textSpan(content,fontSize: this.fontSize)
+        text: TextSpan(
+          children: [
+            ReaderUtil.textSpan(content,fontSize: this.fontSize),
+            // SpaceSpan(contentWidth: 50.0,contentHeight: 1000.0,)
+          ]
+        )
           );
   }
 

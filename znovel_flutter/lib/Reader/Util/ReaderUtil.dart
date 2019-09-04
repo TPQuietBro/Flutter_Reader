@@ -28,6 +28,9 @@ class ReaderUtil{
               color: color,
               fontWeight: FontWeight.w400,
               height: 1.5,
+              // decoration: TextDecoration.underline,
+              // decorationStyle: TextDecorationStyle.dotted,
+              // decorationColor: Colors.black
             )
           );
   }
